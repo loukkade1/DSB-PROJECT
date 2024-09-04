@@ -1,0 +1,202 @@
+---
+title: "Data Visualization with ggplot2"
+author: "Sunicha Kade"
+date: "2024-07-22"
+output:
+  html_document: default
+---
+
+# Load libraries
+```{r message=FALSE, warning=FALSE}
+library(palmerpenguins)
+library(ggplot2)
+print("load library for data visualization")
+```
+
+# Load a dataset
+```{r message=FALSE, warning=FALSE}
+data("penguins")
+```
+
+# Creating a data visualization
+
+### 1. Scatter plot
+Explore the relationship between flipper length `Flipper_length_mm` and body mass `body_mass_g`
+
+a. **Create first scatter plot chart**
+```{r message=FALSE, warning=FALSE}
+#Relationship between flipper length and body mass
+ggplot(data = penguins)+
+  geom_point(mapping = aes(x = flipper_length_mm,
+                           y = body_mass_g,
+                           color = species))
+```
+
+b. **To make a scatter plot more understandable, add shape to each species**
+```{r message=FALSE, warning=FALSE}
+#shape = species
+ggplot(data = penguins)+
+  geom_point(mapping = aes(x = flipper_length_mm,
+                           y = body_mass_g,
+                           shape = species,
+                           size = 3,
+                           color = species,
+                           alpha = 0.4))
+```
+
+**Summary**
+
+The scatter plot shows a positive correlation between flipper length and body mass.In general, penguins with longer flippers tend to have higher body mass. This might be because larger penguins require more mass to support their bodies and propel themselves through water.
+
+### 2. Bar chart
+
+a. **Find the distribution of penguins by each specie**
+
+
+```{r message=FALSE, warning=FALSE}
+#Create a bar chart and add a title
+ggplot(data = penguins) +
+  geom_bar(mapping = aes(x = species,
+                         fill = species))+
+  labs(title = "Distribution of Penguins Species",
+       caption = "Source: ggplot package",
+       x = "Number of Penguins",
+       y = "Penguin Species")
+```
+
+**Summary**
+
+The chart clearly shows that Adelie penguins are the most prevalent species in the dataset, followed by Gentoo penguins, with Chinstrap penguins being the least common.
+
+b. **Compare distribution of penguin species across the different islands** 
+
+```{r message=FALSE, warning=FALSE}
+# Create the bar chart with text labels
+ggplot(data = penguins, aes(x = island, fill = species)) +
+  geom_bar(position = "dodge", stat = "count") +
+  geom_text(stat = "count", aes(label = ..count..), 
+           position = position_dodge(width = 0.9), vjust = -0.5) +
+  labs(title = "Distribution of Penguin Species Across Islands",
+       x = "Island",
+       y = "Count of penguins",
+       fill = "Species") +
+  theme_minimal()
+```
+
+**Here's breakdown of the code:**
+
+- `aes(x = island, fill = species)`: This sets the `x`axis to represent the islands and the fill color of the bars to represent different species of penguins.
+
+- `geom_bar(position = "dodge")`: This creates the bar chart with side-by-side bars for each species within each island.
+
+- `labs()`: This adds labels to the chart, including a title and axis labels.
+
+- `theme_minimal()`: This applies a minimal theme to the plot for a clean appearance.
+
+**Summary**
+
+- **Biscoe Island**: Dominated by Gentoo penguins (124), fewer Adelie penguins (44).
+
+- **Dream Island**: More Chinstrap penguins (68) compared to Adelie penguins (56).
+
+- **Torgersen Island**: Exclusively Adelie penguins (52).
+
+### 3. Facet Grid
+
+Create a grid of plots to compare the distribution of a continuous variable across different categories
+
+a. **Histogram of body mass for each species**
+
+```{r message=FALSE, warning=FALSE}
+# Histogram of body mass for each species
+ggplot(data = penguins, aes(x = body_mass_g, fill = species)) +
+  geom_histogram(binwidth = 120, alpha = 0.7, position = "dodge") +
+  facet_grid(. ~ species) +
+  labs(title = "Histogram of Body Mass by Species",
+       x = "Body Mass (g)",
+       y = "Count") +
+  theme_minimal()
+```
+
+**Explanation**
+
+- The graph compares the distribution of body mass (in grams) across three species: Adelie, Chinstrap, and Gentoo. 
+
+- This visualization helps in understanding the body mass distribution across different penguin species, highlighting the differences in their physical characteristics.
+
+**Summary**
+
+- The histogram effectively shows the distribution and comparison of body mass among the three penguin species.
+
+- Adelie penguins are generally lighter.
+
+- Chinstrap penguins have a similar weight distribution to Adelie but with fewer individuals.
+
+- Gentoo penguins are the heaviest among the three species.
+
+
+### 4. Density Plot
+
+a. **Show the distribution of a continuous variable for different groups**
+
+```{r message=FALSE, warning=FALSE}
+ggplot(data = penguins, aes(x = bill_length_mm, fill = species, color = species)) +
+  geom_density(alpha = 0.5) +
+  labs(title = "Density Plot of Bill Length by Species",
+       x = "Bill Length (mm)",
+       y = "Density") +
+  theme_minimal() 
+
+```
+
+**Summary**
+
+- **Peaks**: Show common bill lengths for each species.
+
+- **Width of Curves**: Indicates variability in bill lengths.
+
+- **Overlap**: Shows common bill lengths between species.
+
+- **Unique Peaks**: Indicate unique characteristics of a species.
+
+**Interpreting Density Values:**
+
+- A density value of, for example, 0.05 at a bill length of 40 mm means that the probability density of bill lengths around 40 mm is 0.05.
+
+- Higher density values indicate more common bill lengths, while lower density values indicate less common bill lengths.
+
+**Visual Representation**
+
+- The peaks of the density plot show where the bill lengths are most concentrated.
+Wider sections of the plot represent a larger spread of bill lengths.
+
+- The height of the density curve at a specific bill length gives a sense of how common or frequent that bill length is in the data.
+
+
+### 5. Simple scatter plot with smooth trend line
+
+We'll create a scatter plot showing the relationship between `flipper_length_mm` and `body_mass_g` and add a smoothed trend line to illustrate the overall trend.
+
+```{r message=FALSE, warning=FALSE}
+ggplot(data = penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point(color = "blue") +  # Plot the points
+  geom_smooth(method = "loess", se = FALSE, color = "red") +  # Add a smoothed line
+  labs(title = "Relationship Between Flipper Length and Body Mass",
+       x = "Flipper Length (mm)",
+       y = "Body Mass (g)") +
+  theme_minimal()
+```
+
+
+**Plot creation**:
+
+`geom_smooth`: Add trend line
+
+`se = FALSE`: Does not display the shaded confidence interval around the smoothed line.
+
+`method = "loess"` : Uses locally estimated scatter plot smoothing (LOESS) curve to your data
+
+
+**Summary**: 
+
+If the smoothed line slopes upwards from left to right, it indicates a positive relationship between `flipper_length_mm` and `body_mass_g`. This means that as the flipper length increases, the body mass of the penguins tends to increase as well.
